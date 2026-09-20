@@ -128,6 +128,11 @@ function ResultsPage() {
               <Pencil className="size-4" /> {editing ? "Done editing" : "Edit mode"}
             </Button>
             <Button variant="outline" asChild>
+              <Link to="/edit/$shareId" params={{ shareId }}>
+                Edit details &amp; regenerate
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
               <Link to="/library">Event library</Link>
             </Button>
           </div>
