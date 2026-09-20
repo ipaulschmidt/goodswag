@@ -10,33 +10,63 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LibraryRouteImport } from './routes/library'
+import { Route as EditShareIdRouteImport } from './routes/edit.$shareId'
+import { Route as RShareIdRouteImport } from './routes/r.$shareId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LibraryRoute = LibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EditShareIdRoute = EditShareIdRouteImport.update({
+  id: '/edit/$shareId',
+  path: '/edit/$shareId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RShareIdRoute = RShareIdRouteImport.update({
+  id: '/r/$shareId',
+  path: '/r/$shareId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/library': typeof LibraryRoute
+  '/edit/$shareId': typeof EditShareIdRoute
+  '/r/$shareId': typeof RShareIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/library': typeof LibraryRoute
+  '/edit/$shareId': typeof EditShareIdRoute
+  '/r/$shareId': typeof RShareIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/library': typeof LibraryRoute
+  '/edit/$shareId': typeof EditShareIdRoute
+  '/r/$shareId': typeof RShareIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/library' | '/edit/$shareId' | '/r/$shareId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/library' | '/edit/$shareId' | '/r/$shareId'
+  id: '__root__' | '/' | '/library' | '/edit/$shareId' | '/r/$shareId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LibraryRoute: typeof LibraryRoute
+  EditShareIdRoute: typeof EditShareIdRoute
+  RShareIdRoute: typeof RShareIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +78,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/library': {
+      id: '/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof LibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/edit/$shareId': {
+      id: '/edit/$shareId'
+      path: '/edit/$shareId'
+      fullPath: '/edit/$shareId'
+      preLoaderRoute: typeof EditShareIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/r/$shareId': {
+      id: '/r/$shareId'
+      path: '/r/$shareId'
+      fullPath: '/r/$shareId'
+      preLoaderRoute: typeof RShareIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LibraryRoute: LibraryRoute,
+  EditShareIdRoute: EditShareIdRoute,
+  RShareIdRoute: RShareIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
