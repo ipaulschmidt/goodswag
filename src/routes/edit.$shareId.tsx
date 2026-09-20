@@ -161,9 +161,23 @@ function EditPage() {
             />
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-3">
+          <div>
+            <h2 className="font-display text-lg font-bold">What should each item cost?</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Most ideas stay in your usual range. Standout ideas may cost more, up to the limit
+              below.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="font-display font-bold">Usual price range</h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Most recommendations will cost between these amounts per item.
+            </p>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="min">Standard min</Label>
+              <Label htmlFor="min">Lowest price per item</Label>
               <Input
                 id="min"
                 type="number"
@@ -172,7 +186,7 @@ function EditPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="max">Standard max</Label>
+              <Label htmlFor="max">Highest price per item</Label>
               <Input
                 id="max"
                 type="number"
@@ -180,14 +194,20 @@ function EditPage() {
                 onChange={(e) => setForm({ ...form, standard_budget_max: e.target.value })}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="reach">Reach max</Label>
+          </div>
+
+          <div className="border-t-2 border-ink pt-5">
+            <div className="space-y-2 sm:max-w-[calc(50%-0.625rem)]">
+              <Label htmlFor="reach">Maximum price for a standout item</Label>
               <Input
                 id="reach"
                 type="number"
                 value={form.reach_budget_max}
                 onChange={(e) => setForm({ ...form, reach_budget_max: e.target.value })}
               />
+              <p className="text-xs text-muted-foreground">
+                A few special ideas can exceed your usual range, but not this amount.
+              </p>
             </div>
           </div>
 
