@@ -1,136 +1,74 @@
-# Swag Genius
+# Non-Boring Swag
 
-Build a web app called "Non-Boring Swag" that helps event marketers pick tradeshow and conference swag that isn't the usual junk drawer filler, sized to a real budget.
+**Tradeshow and conference swag ideas people actually keep, sized to your real budget.**
 
-CORE FLOW
+Live app: https://goodswag.lovable.app
 
-1. New Event intake form
+Most booth giveaways end up in a junk drawer: pens, tote bags, stress balls, water bottles. Non-Boring Swag researches your event and its audience, then suggests memorable alternatives that fit what you want to spend, with real supplier links for each idea.
 
-   Required fields:
+---
 
-   - Event name
+## How it works
 
-   - Standard budget per item
+1. **Tell it about your event.** Enter the event name and what you'd like to spend per item. Everything else is optional: event website, notes about the audience, booth size, whether you'll have staff for a hands-on activity, expected attendance, and brand guidelines.
+2. **It does the research.** The app looks up the event online to learn who attends, what industry it serves, and what exhibitors usually hand out. It checks current trends for that audience and steers clear of a list of overused giveaways.
+3. **Get two sets of ideas.**
+   - **Within budget:** ideas inside your usual price range.
+   - **Standout:** a few bigger ideas, up to your maximum price for a standout item.
 
-   All other fields are pre-filled with editable defaults so the form can be submitted with just the two fields above:
+Each idea shows what it is, why it fits this audience, an estimated price per unit, links to suppliers, and how people engage with it:
 
-   - Event URL: blank, optional
+| Type | What it means |
+| --- | --- |
+| **Grab and go** | Picked up from the table, no interaction needed |
+| **Personalized** | Customized for each person (name, color, size) with little staff time |
+| **Interactive on site** | Made or experienced at the booth, such as live engraving, printing, or a photo booth |
 
-   - Industry/vertical and audience context: not asked upfront, left blank. The AI determines this during research from the event name (and URL if given). A "context notes" free text field stays available for the user to override or add detail if they already know something specific.
+Ideas lean toward personalized and interactive options. If an idea needs staff or equipment you said you won't have, it's flagged.
 
-   - Standard budget range: default min = 70% of the entered per-item budget, default max = the entered per-item budget, both editable
+---
 
-   - Reach/stretch budget max: default = 4x the entered per-item budget, editable
+## Using the results page
 
-   - Booth size: default "Standard 10x10", editable (tabletop / standard 10x10 / island / other)
+Every event gets its own private link that is hard to guess. Anyone with the link can view the results; no account is needed.
 
-   - Staffing available for an interactive activation: default Yes, editable
+- **Copy link:** share the recommendations with your team or a client.
+- **Export PDF:** download a clean, printable version.
+- **Edit mode:**
+  - Dismiss ideas you don't want, with an optional reason. Dismissed ideas are hidden from the shared view and the PDF but are not deleted, so you can restore them later.
+  - **Refresh** a section to fill the empty slots with new ideas. The app uses what you kept and what you dismissed (and why) so it won't repeat itself.
 
-   - Estimated attendee volume: default blank (treated as unknown, AI estimates from event research if left blank)
+## Event library
 
-   - Brand colors or guidelines: default blank, optional
+- See all your saved events with industry, budget, and creation date.
+- **Duplicate** an event to use as a starting point for a similar show.
+- **Edit details** and regenerate everything if the event changes.
 
-2. Generation step (background job with a loading state)
+---
 
-   Calls an AI model with live web search enabled to:
+## Tech stack
 
-   a. Research the event itself: attendee profile, industry, typical exhibitor patterns (using context notes as override/supplement if provided)
+- [TanStack Start](https://tanstack.com/start) (React 19, Vite) with server functions
+- Tailwind CSS v4 and shadcn/ui
+- Postgres database with row-level security
+- AI model with live web search, returning structured JSON so results render straight into the page
 
-   b. Cross-reference against a "common boring swag" baseline (see reference list below) plus whatever this event's context suggests exhibitors usually hand out
+## Running locally
 
-   c. Research current trend signals relevant to the event's audience
-
-   d. Generate 3-5 standard-tier swag recommendations that fit inside the given budget and actively avoid the boring baseline
-
-   e. Generate 1-3 reach-tier recommendations above budget, for exhibitors willing to spend more for standout impact
-
-   f. For every recommendation, search for and include real supplier or vendor links
-
-3. Results page
-
-   URL: each event gets one persistent, unique shareable URL (e.g. /r/[shareId]) generated at first save. This is the same URL used internally and shared with clients; it always reflects the current state of the event's recommendations.
-
-   Top of page: event name, and the inputs used to generate the results (budget range, reach budget, booth size, staffing, attendee volume, industry as detected) so anyone viewing knows what these were built around.
-
-   Two sections below: Standard and Reach. Each item as a card: name, short description, why it fits (trend or audience tie-in), an engagement type badge, estimated per-unit price, and supplier links.
-
-   Buttons on this page:
-
-   - Copy shareable link
-
-   - Export as PDF (same content as the page: inputs at top, then both tiers, dismissed items excluded)
-
-   - Edit mode toggle
-
-   Edit mode:
-
-   - Each card gets a dismiss control (X or cross-out styling) with an optional short reason field
-
-   - Dismissed items are visually marked, excluded from the client-facing/public rendering and from PDF export, but not deleted
-
-   - A "Refresh" button per tier regenerates only enough new items to bring that tier back to its target count, using the kept items and the dismissed items (and reasons, if given) as context so it doesn't resuggest something already rejected or duplicate something already kept
-
-4. Event Library
-
-   - List of saved events (name, industry as detected, budget, date created, shareable link)
-
-   - Click into an event to reach its results/edit page
-
-   - Duplicate an event as a starting template for a similar future show
-
-   - Edit intake details and regenerate from scratch if the event itself changes
-
-DATA MODEL
-
-events table: id, name, event_url, context_notes, industry_detected, standard_budget_min, standard_budget_max, reach_budget_max, booth_size, staffing_available, attendee_volume, brand_colors, share_slug (unique), created_at
-
-swag_recommendations table: id, event_id (FK), tier (standard/reach), item_name, description, rationale, engagement_type, estimated_price, supplier_links (array of {name, url}), trend_tie_in, status (active/dismissed), dismiss_reason, created_at
-
-ENGAGEMENT TYPE (fixed categories, tag every recommendation with one)
-
-- grab_and_go: picked up, no interaction
-
-- personalized: customized for the recipient (name, color, size) with minimal staffing
-
-- interactive_onsite: created, built, or experienced at the booth (engraving, live printing, AI photo booth, build-a-something station, spin to win)
-
-Weight standard-tier recommendations toward personalized and interactive_onsite over grab_and_go, and flag in the UI when an interactive_onsite item needs staffing or equipment the intake form said isn't available.
-
-BORING SWAG BASELINE (seed this as a reference list the AI checks against, expandable later)
-
-Pens, tote bags, koozies, stress balls, phone chargers/cables, water bottles, notepads, mints/candy, USB drives, sunglasses, lanyards, mousepads, generic phone stands, branded sticky notes
-
-OUTPUT CONTRACT
-
-Each AI generation call should return structured JSON matching the swag_recommendations fields above, not freeform text, so results render directly into the page.
-
-V1 SCOPE
-
-- Skip live price syncing with vendor sites, an estimated price plus a link is enough for now
-
-- No multi-user sharing or accounts required for the public share link, it just needs to be unguessable (long random slug)
-
-- No login required to view a shared link; editing still requires being in the authenticated app
-
-This project was built with [Lovable](https://lovable.dev).
-
-**Live app**: https://goodswag.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/c1a1b2c1-1c8d-4fea-8786-c8eb279f31bc).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Requires Node.js 20+ (or Bun).
 
 ```sh
 git clone <this-repository-url>
 cd <repository-name>
-npm i
+cp .env.example .env   # fill in your own values
+npm install
 npm run dev
 ```
+
+AI generation needs an API key provided as a server environment variable (`LOVABLE_API_KEY`). It is never stored in the repository.
+
+## Roadmap
+
+- Live price syncing with supplier sites
+- Sign-in for editing, while share links stay public
+- Expandable list of overused giveaways to avoid
